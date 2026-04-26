@@ -50,6 +50,7 @@ export default function Hero() {
       {/* Right side: large campus photo card */}
       <div
         ref={imgRef}
+        className="hero-images"
         style={{
           position: 'absolute',
           right: 0,
@@ -307,7 +308,7 @@ export default function Hero() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@400;500&display=swap');
         @media (max-width: 860px) {
-          #home > div:nth-child(4) { display: none !important; }
+          .hero-images { display: none !important; }
         }
       `}</style>
     </section>

@@ -89,7 +89,7 @@ export default function AIChatbot() {
       console.error('AI chat error:', err);
       setMessages(prev => [...prev, {
         role: 'bot',
-        text: '⚠️ Connection error. Make sure the backend is running on port 8080.',
+        text: '⚠️ Connection error or AI API Key missing. Please make sure the backend is running and GROQ_API_KEY is configured.',
         time: new Date(),
       }]);
     } finally {

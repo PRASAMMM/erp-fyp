@@ -89,10 +89,7 @@ export default function LoginPanel() {
             {loading ? 'Signing in…' : `Sign in as ${role}`}
           </button>
         </form>
-        <div style={{ marginTop:16, padding:12, backgroundColor:'rgba(255,255,255,0.03)', borderRadius:3, border:'1px solid rgba(255,255,255,0.06)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-          <div style={{ fontSize:10.5, color:'rgba(255,255,255,0.26)', fontFamily:'system-ui,sans-serif' }}>Demo: {DEMO[role].username} / {DEMO[role].password}</div>
-          <button onClick={fillDemo} style={{ padding:'5px 10px', backgroundColor:'transparent', border:'1px solid rgba(255,255,255,0.12)', borderRadius:3, color:'rgba(255,255,255,0.45)', fontSize:11, fontFamily:'system-ui,sans-serif', cursor:'pointer' }}>Fill</button>
-        </div>
+        {/* Demo hints removed */}
       </div>
     </div>
   );
