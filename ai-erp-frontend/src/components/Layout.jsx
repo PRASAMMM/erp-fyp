@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Sidebar from './Sidebar';
 import AIChatbot from './AIChatbot';
 import { Icons } from './Icons';
@@ -5,13 +6,23 @@ import { useAuth } from '../context/AuthContext';
 
 export default function Layout({ children, title }) {
   const { user } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <div className="app-layout">
-      <Sidebar />
+      {/* Mobile overlay */}
+      <div className={`sidebar-overlay ${menuOpen ? 'open' : ''}`} onClick={() => setMenuOpen(false)} />
+      
+      <div className={`sidebar-container ${menuOpen ? 'open' : ''}`}>
+        <Sidebar />
+      </div>
+
       <div className="main-content">
         {/* Topbar */}
         <div className="topbar">
+          <button className="mobile-menu-btn" onClick={() => setMenuOpen(true)}>
+             <Icons.Menu />
+          </button>
           <div className="topbar-title">{title}</div>
           <div className="topbar-actions">
             <button className="btn btn-ghost" style={{ padding: 8, borderRadius: 'var(--radius-sm)', position: 'relative' }}>
