@@ -59,7 +59,10 @@ export default function LoginPanel() {
   return (
     <div style={{ backgroundColor:'#0f1a2e', border:'1px solid rgba(255,255,255,0.08)', borderRadius:6, overflow:'hidden', maxWidth:400, width:'100%', boxShadow:'0 20px 60px rgba(0,0,0,0.4)' }}>
       <div style={{ padding:'20px 24px 0', borderBottom:'1px solid rgba(255,255,255,0.06)' }}>
-        <div style={{ fontSize:11, color:'rgba(255,255,255,0.28)', letterSpacing:'1.5px', textTransform:'uppercase', fontFamily:'system-ui,sans-serif', marginBottom:16 }}>EICT Campus Portal</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 16 }}>
+          <img src="/eict_logo.png" alt="EICT" style={{ width: 22, height: 22, borderRadius: 4 }} />
+          <div style={{ fontSize:11, color:'rgba(255,255,255,0.28)', letterSpacing:'1.5px', textTransform:'uppercase', fontFamily:'system-ui,sans-serif' }}>EICT Campus Portal</div>
+        </div>
         <div style={{ display:'flex' }}>
           {ROLES.map(r => (
             <button key={r} onClick={() => { setRole(r); setError(''); setUsername(''); setPassword(''); }}

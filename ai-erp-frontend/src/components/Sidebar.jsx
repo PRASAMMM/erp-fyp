@@ -82,7 +82,7 @@ export default function Sidebar() {
     <div className="sidebar">
       <div className="sidebar-logo">
         <div className="logo-mark">
-          <div className="logo-icon">E</div>
+          <img src="/eict_logo.png" alt="EICT" style={{ width: 32, height: 32, borderRadius: 6 }} />
           <span className="logo-text">EICT</span>
           <span className="logo-badge">PRO</span>
         </div>

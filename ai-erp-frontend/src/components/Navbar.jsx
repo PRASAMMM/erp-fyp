@@ -31,7 +31,7 @@ export default function Navbar() {
     <nav style={navStyle}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: scrolled ? 60 : 72, transition: 'height 0.3s' }}>
         <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 36, height: 36, backgroundColor: '#1a4fa0', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 14, color: 'white', fontFamily: 'Georgia,serif' }}>E</div>
+          <img src="/eict_logo.png" alt="EICT" style={{ width: 36, height: 36, borderRadius: 6 }} />
           <div>
             <div style={{ fontFamily: 'Georgia,serif', fontWeight: 700, fontSize: 16, color: 'white', lineHeight: 1.1 }}>EICT</div>
             <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', letterSpacing: '1.5px', textTransform: 'uppercase', fontFamily: 'system-ui,sans-serif' }}>Kathmandu</div>
