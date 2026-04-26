@@ -50,7 +50,7 @@ export default function About() {
               boxShadow: '0 32px 80px rgba(0,0,0,0.6)',
             }}>
               <img
-                src="https://images.unsplash.com/photo-1562774053-701939374585?w=700&q=80&fit=crop&crop=center"
+                src="/assets/campus_bg.png"
                 alt="College campus building"
                 style={{
                   width: '100%', height: '100%',
@@ -89,7 +89,7 @@ export default function About() {
               border: '3px solid #06101f',
             }}>
               <img
-                src="https://images.unsplash.com/photo-1590012314607-cda9d9b699ae?w=500&q=80&fit=crop"
+                src="/assets/students_studying.png"
                 alt="Students in class"
                 style={{
                   width: '100%', height: '100%',

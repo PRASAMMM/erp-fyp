@@ -34,7 +34,7 @@ export default function Hero() {
       {/* Full-bleed background photo — dimmed */}
       <div style={{
         position: 'absolute', inset: 0,
-        backgroundImage: `url('https://images.unsplash.com/photo-1562774053-701939374585?w=1800&q=80&fit=crop')`,
+        backgroundImage: `url('/assets/campus_bg.png')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center 40%',
         opacity: 0.18,
@@ -73,7 +73,7 @@ export default function Hero() {
           border: '1px solid rgba(255,255,255,0.06)',
         }}>
           <img
-            src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=700&q=80&fit=crop"
+            src="/assets/students_lab.png"
             alt="Students in computer lab"
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: 'brightness(0.85)' }}
           />
@@ -93,7 +93,7 @@ export default function Hero() {
           border: '1px solid rgba(255,255,255,0.06)',
         }}>
           <img
-            src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=500&q=80&fit=crop"
+            src="/assets/students_studying.png"
             alt="Students studying"
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: 'brightness(0.8)' }}
           />

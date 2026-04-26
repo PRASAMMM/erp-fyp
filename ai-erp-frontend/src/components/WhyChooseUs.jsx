@@ -81,7 +81,7 @@ export default function WhyChooseUs() {
         top: 0, right: 0,
         width: '38%', height: '100%',
         opacity: 0.07,
-        backgroundImage: `url('https://images.unsplash.com/photo-1509062522246-3755977927d7?w=900&q=80&fit=crop')`,
+        backgroundImage: `url('/assets/campus_bg.png')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         maskImage: 'linear-gradient(to left, black 0%, transparent 100%)',
@@ -128,7 +128,7 @@ export default function WhyChooseUs() {
             boxShadow: '0 16px 40px rgba(0,0,0,0.5)',
           }}>
             <img
-              src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&q=80&fit=crop"
+              src="/assets/students_lab.png"
               alt="Students collaborating"
               style={{
                 width: '100%', height: '100%',
