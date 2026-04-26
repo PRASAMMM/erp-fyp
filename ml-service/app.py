@@ -103,6 +103,9 @@ def predict_risk():
               missed_deadlines, study_hours_daily, subject_count }
     Output: { is_at_risk, risk_level, confidence, label }
     """
+    if clf_risk is None or scaler is None:
+        return jsonify({'error': 'Models not loaded on server. Please retrain models.'}), 503
+
     try:
         data  = request.get_json(force=True)
         X     = parse_features(data)
@@ -129,6 +132,9 @@ def predict_performance():
               missed_deadlines, study_hours_daily, subject_count }
     Output: { predicted_score, grade, interpretation }
     """
+    if reg_perf is None or scaler is None:
+        return jsonify({'error': 'Models not loaded on server. Please retrain models.'}), 503
+
     try:
         data  = request.get_json(force=True)
         X     = parse_features(data)
@@ -160,6 +166,9 @@ def predict_anomaly():
     Input:  { avg_attendance, missed_deadlines, midterm_score }
     Output: { is_anomaly, anomaly_score, message }
     """
+    if iso_anomaly is None or scaler is None:
+        return jsonify({'error': 'Models not loaded on server. Please retrain models.'}), 503
+
     try:
         data       = request.get_json(force=True)
         attendance = float(data.get('avg_attendance',    75.0))
@@ -182,6 +191,11 @@ def predict_full():
     Run all three models and return a combined prediction object.
     This is the single endpoint called by Spring Boot.
     """
+    if None in (clf_risk, reg_perf, iso_anomaly, scaler):
+        return jsonify({
+            'error': 'ML models are missing or incompatible. Please wait for training.'
+        }), 503
+
     try:
         data = request.get_json(force=True)
         X    = parse_features(data)
