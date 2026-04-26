@@ -70,10 +70,6 @@ export default function StudentMaterials() {
           <Icons.Search />
           <input className="search-input" placeholder="Search materials..." value={search} onChange={e => setSearch(e.target.value)} />
         </div>
-        <select className="form-input form-select" style={{ width: 160 }} value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
-          <option value="">All Types</option>
-          {Object.keys(typeIcons).map(t => <option key={t} value={t}>{typeIcons[t]} {t}</option>)}
-        </select>
       </div>
 
       {loading ? (
