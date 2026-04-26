@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import * as api from '../../services/api';
 import Layout from '../../components/Layout';
 import StudentTimetable   from '../../components/StudentTimetable';
-import AIRecommendations  from '../../components/AIRecommendations';
+import AIRecommendations  from '../../components/AiRecommendations';
 import MLPredictionCard from '../../components/MLPredictionCard';
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
