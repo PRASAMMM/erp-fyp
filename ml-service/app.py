@@ -17,13 +17,23 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# ── Load models once at startup ───────────────────────────────────────
+# ── Load models safely at startup ───────────────────────────────────────
 BASE = os.path.dirname(os.path.abspath(__file__))
 
-scaler       = joblib.load(os.path.join(BASE, 'scaler.pkl'))
-clf_risk     = joblib.load(os.path.join(BASE, 'at_risk_model.pkl'))
-reg_perf     = joblib.load(os.path.join(BASE, 'performance_model.pkl'))
-iso_anomaly  = joblib.load(os.path.join(BASE, 'anomaly_model.pkl'))
+scaler = None
+clf_risk = None
+reg_perf = None
+iso_anomaly = None
+
+try:
+    scaler       = joblib.load(os.path.join(BASE, 'scaler.pkl'))
+    clf_risk     = joblib.load(os.path.join(BASE, 'at_risk_model.pkl'))
+    reg_perf     = joblib.load(os.path.join(BASE, 'performance_model.pkl'))
+    iso_anomaly  = joblib.load(os.path.join(BASE, 'anomaly_model.pkl'))
+    print("✅ All ML models loaded successfully.")
+except Exception as e:
+    print(f"⚠️ Warning: Failed to load one or more ML models: {e}")
+    print("The API will run, but predictions may fail until models are trained.")
 
 FEATURES = ['avg_attendance', 'midterm_score', 'assignment_score',
             'missed_deadlines', 'study_hours_daily', 'subject_count']
@@ -79,6 +89,10 @@ def health():
         'models':  ['at_risk_model', 'performance_model', 'anomaly_model'],
         'version': '1.0.0',
     })
+
+@app.route('/')
+def root():
+    return jsonify({ "status": "ML service running" })
 
 
 @app.route('/predict/risk', methods=['POST'])
