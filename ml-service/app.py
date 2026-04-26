@@ -1,21 +1,29 @@
 """
-EduERP ML Service — Flask API
+EduERP ML Service — FastAPI
 Exposes 4 endpoints:
   POST /predict/risk        — At-risk classification
   POST /predict/performance — Final score prediction
   POST /predict/anomaly     — Attendance anomaly detection
   POST /predict/full        — All three at once (used by Spring Boot)
-  GET  /health              — Health check
+  GET  /                    — Health check
 """
 
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 import joblib
 import numpy as np
 import os
 
-app = Flask(__name__)
-CORS(app)
+app = FastAPI(title="EduERP ML Service", description="AI prediction endpoints for EduERP")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # ── Load models safely at startup ───────────────────────────────────────
 BASE = os.path.dirname(os.path.abspath(__file__))
@@ -52,7 +60,6 @@ def parse_features(data: dict) -> np.ndarray:
     ]]
     return scaler.transform(row)
 
-
 def grade_band(score: float) -> str:
     if score >= 80: return 'A'
     if score >= 65: return 'B'
@@ -60,16 +67,13 @@ def grade_band(score: float) -> str:
     if score >= 40: return 'D'
     return 'F'
 
-
 def risk_level(prob: float) -> str:
     if prob >= 0.75: return 'HIGH'
     if prob >= 0.45: return 'MEDIUM'
     return 'LOW'
 
-
 def anomaly_score_from_row(attendance: float, missed: float, midterm: float) -> dict:
     row_att = np.array([[attendance, missed, midterm]])
-    from sklearn.preprocessing import StandardScaler as SS
     # Use the raw isolation forest decision function
     score = iso_anomaly.decision_function(row_att)[0]
     label = iso_anomaly.predict(row_att)[0]
@@ -81,62 +85,59 @@ def anomaly_score_from_row(attendance: float, missed: float, midterm: float) -> 
 
 # ── Routes ────────────────────────────────────────────────────────────
 
-@app.route('/health')
+@app.get("/")
+def home():
+    return {"status": "ML service running"}
+
+@app.get("/health")
 def health():
-    return jsonify({
+    return {
         'status':  'UP',
         'service': 'EduERP ML Service',
         'models':  ['at_risk_model', 'performance_model', 'anomaly_model'],
         'version': '1.0.0',
-    })
+    }
 
-@app.route('/')
-def root():
-    return jsonify({ "status": "ML service running" })
-
-
-@app.route('/predict/risk', methods=['POST'])
-def predict_risk():
+@app.post("/predict/risk")
+async def predict_risk(request: Request):
     """
     Classify a student as at-risk or on-track.
-    Input:  { avg_attendance, midterm_score, assignment_score,
-              missed_deadlines, study_hours_daily, subject_count }
+    Input:  { avg_attendance, midterm_score, assignment_score, missed_deadlines, study_hours_daily, subject_count }
     Output: { is_at_risk, risk_level, confidence, label }
     """
     if clf_risk is None or scaler is None:
-        return jsonify({'error': 'Models not loaded on server. Please retrain models.'}), 503
+        return JSONResponse(status_code=503, content={'error': 'Models not loaded on server. Please retrain models.'})
 
     try:
-        data  = request.get_json(force=True)
+        data  = await request.json()
         X     = parse_features(data)
         pred  = clf_risk.predict(X)[0]
         proba = clf_risk.predict_proba(X)[0]
         prob_at_risk = float(proba[1])
 
-        return jsonify({
+        return {
             'is_at_risk':  bool(pred == 1),
             'risk_level':  risk_level(prob_at_risk),
             'confidence':  round(float(max(proba)) * 100, 1),
             'label':       'AT RISK' if pred == 1 else 'ON TRACK',
             'probability': round(prob_at_risk, 3),
-        })
+        }
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        return JSONResponse(status_code=400, content={'error': str(e)})
 
 
-@app.route('/predict/performance', methods=['POST'])
-def predict_performance():
+@app.post("/predict/performance")
+async def predict_performance(request: Request):
     """
     Predict a student's final exam score.
-    Input:  { avg_attendance, midterm_score, assignment_score,
-              missed_deadlines, study_hours_daily, subject_count }
+    Input:  { avg_attendance, midterm_score, assignment_score, missed_deadlines, study_hours_daily, subject_count }
     Output: { predicted_score, grade, interpretation }
     """
     if reg_perf is None or scaler is None:
-        return jsonify({'error': 'Models not loaded on server. Please retrain models.'}), 503
+        return JSONResponse(status_code=503, content={'error': 'Models not loaded on server. Please retrain models.'})
 
     try:
-        data  = request.get_json(force=True)
+        data  = await request.json()
         X     = parse_features(data)
         score = float(reg_perf.predict(X)[0])
         score = round(min(max(score, 0), 100), 1)
@@ -149,28 +150,28 @@ def predict_performance():
             'D': 'Below average — at risk of failing. Intervention advised.',
             'F': 'Critical — student is likely to fail. Urgent intervention needed.',
         }
-        return jsonify({
+        return {
             'predicted_score': score,
             'grade':           grade,
             'interpretation':  interp_map[grade],
             'pass':            score >= 40,
-        })
+        }
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        return JSONResponse(status_code=400, content={'error': str(e)})
 
 
-@app.route('/predict/anomaly', methods=['POST'])
-def predict_anomaly():
+@app.post("/predict/anomaly")
+async def predict_anomaly(request: Request):
     """
     Detect unusual attendance patterns.
     Input:  { avg_attendance, missed_deadlines, midterm_score }
     Output: { is_anomaly, anomaly_score, message }
     """
     if iso_anomaly is None or scaler is None:
-        return jsonify({'error': 'Models not loaded on server. Please retrain models.'}), 503
+        return JSONResponse(status_code=503, content={'error': 'Models not loaded on server. Please retrain models.'})
 
     try:
-        data       = request.get_json(force=True)
+        data       = await request.json()
         attendance = float(data.get('avg_attendance',    75.0))
         missed     = float(data.get('missed_deadlines',   1.0))
         midterm    = float(data.get('midterm_score',     60.0))
@@ -180,24 +181,24 @@ def predict_anomaly():
             if result['is_anomaly']
             else 'Attendance pattern appears normal.'
         )
-        return jsonify(result)
+        return result
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        return JSONResponse(status_code=400, content={'error': str(e)})
 
 
-@app.route('/predict/full', methods=['POST'])
-def predict_full():
+@app.post("/predict/full")
+async def predict_full(request: Request):
     """
     Run all three models and return a combined prediction object.
     This is the single endpoint called by Spring Boot.
     """
     if None in (clf_risk, reg_perf, iso_anomaly, scaler):
-        return jsonify({
+        return JSONResponse(status_code=503, content={
             'error': 'ML models are missing or incompatible. Please wait for training.'
-        }), 503
+        })
 
     try:
-        data = request.get_json(force=True)
+        data = await request.json()
         X    = parse_features(data)
 
         # Model 1 — At-risk
@@ -215,7 +216,7 @@ def predict_full():
         midterm    = float(data.get('midterm_score', 60.0))
         anom       = anomaly_score_from_row(attendance, missed, midterm)
 
-        return jsonify({
+        return {
             'risk': {
                 'is_at_risk':  bool(pred_risk == 1),
                 'risk_level':  risk_level(prob_risk),
@@ -240,20 +241,12 @@ def predict_full():
                 f"Grade: {grade_band(pred_score)} | "
                 f"Anomaly: {'Yes' if anom['is_anomaly'] else 'No'}"
             ),
-        })
+        }
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
-
+        return JSONResponse(status_code=400, content={'error': str(e)})
 
 if __name__ == '__main__':
+    import uvicorn
     port = int(os.environ.get('PORT', 5001))
-    print("=" * 50)
-    print(f"  EduERP ML Service starting on port {port}")
-    print("  Endpoints:")
-    print("    GET  /health")
-    print("    POST /predict/risk")
-    print("    POST /predict/performance")
-    print("    POST /predict/anomaly")
-    print("    POST /predict/full     ← Spring Boot uses this")
-    print("=" * 50)
-    app.run(host='0.0.0.0', port=port, debug=False)
+    print(f"Starting EduERP ML Service on port {port}")
+    uvicorn.run("app:app", host="0.0.0.0", port=port, reload=False)
