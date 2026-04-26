@@ -74,7 +74,7 @@ export default function AIChatbot() {
       const username = user?.username || user?.rollNumber || user?.email || user?.name || 'unknown';
       const role     = user?.role || 'STUDENT';
 
-      const res = await fetch('http://localhost:8080/api/ai/chat', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8080/api'}/ai/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: msg, username, role }),

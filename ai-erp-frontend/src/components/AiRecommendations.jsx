@@ -84,7 +84,7 @@ Student: ${username}
 
 Generate recommendations now:`;
 
-      const res = await fetch('http://localhost:8080/api/ai/chat', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8080/api'}/ai/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: prompt, username, role: 'STUDENT' }),
