@@ -8,8 +8,20 @@ export default function AdminAssignments() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
+  const [students, setStudents] = useState([]);
+
   useEffect(() => {
-    api.getAllAssignments().then(d => setAssignments(d || [])).catch(console.error).finally(() => setLoading(false));
+    Promise.allSettled([api.getAllAssignments(), api.getStudents()]).then(([a, s]) => {
+      const allStudents = s.status === 'fulfilled' ? (s.value || []) : [];
+      const studentIds = new Set(allStudents.map(student => student.id));
+      
+      let allAsg = a.status === 'fulfilled' ? (a.value || []) : [];
+      allAsg = allAsg.filter(asg => studentIds.has(asg.studentId));
+      
+      setAssignments(allAsg);
+      setStudents(allStudents);
+      setLoading(false);
+    });
   }, []);
 
   const filtered = assignments.filter(a => {

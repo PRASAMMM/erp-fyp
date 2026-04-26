@@ -12,8 +12,15 @@ export default function AdminMarks() {
 
   useEffect(() => {
     Promise.allSettled([api.getAllMarks(), api.getStudents()]).then(([m, s]) => {
-      if (m.status === 'fulfilled') setMarks(m.value || []);
-      if (s.status === 'fulfilled') setStudents(s.value || []);
+      const allStudents = s.status === 'fulfilled' ? (s.value || []) : [];
+      const studentIds = new Set(allStudents.map(student => student.id));
+      
+      let allMarks = m.status === 'fulfilled' ? (m.value || []) : [];
+      // Filter out orphaned records belonging to deleted students
+      allMarks = allMarks.filter(mark => studentIds.has(mark.studentId));
+
+      setMarks(allMarks);
+      setStudents(allStudents);
       setLoading(false);
     });
   }, []);

@@ -8,8 +8,20 @@ export default function AdminAttendance() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
+  const [students, setStudents] = useState([]);
+
   useEffect(() => {
-    api.getAllAttendance().then(d => setAttendance(d || [])).catch(console.error).finally(() => setLoading(false));
+    Promise.allSettled([api.getAllAttendance(), api.getStudents()]).then(([a, s]) => {
+      const allStudents = s.status === 'fulfilled' ? (s.value || []) : [];
+      const studentIds = new Set(allStudents.map(student => student.id));
+      
+      let allAtt = a.status === 'fulfilled' ? (a.value || []) : [];
+      allAtt = allAtt.filter(att => studentIds.has(att.studentId));
+      
+      setAttendance(allAtt);
+      setStudents(allStudents);
+      setLoading(false);
+    });
   }, []);
 
   const filtered = attendance.filter(a => {
