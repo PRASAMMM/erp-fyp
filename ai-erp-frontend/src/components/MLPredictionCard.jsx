@@ -162,16 +162,6 @@ export default function MLPredictionCard({ studentId }) {
         </p>
       </div>
 
-      {/* Anomaly flag */}
-      {anomaly?.is_anomaly && (
-        <div style={{
-          background: 'rgba(217, 119, 6, 0.1)', border: '1px solid rgba(217, 119, 6, 0.2)',
-          borderRadius: 8, padding: '8px 14px', marginBottom: 14,
-          fontSize: 12, color: '#f59e0b',
-        }}>
-          <strong>Attendance anomaly detected</strong> — unusual pattern flagged by AI. Talk to your faculty.
-        </div>
-      )}
 
       {/* Expandable feature details */}
       {feat && (
