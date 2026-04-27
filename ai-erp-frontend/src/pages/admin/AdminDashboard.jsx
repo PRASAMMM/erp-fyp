@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
 import { Icons } from '../../components/Icons';
 import * as api from '../../services/api';
@@ -30,6 +31,7 @@ const MiniBar = ({ label, value, max, color }) => (
 );
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
   const [students, setStudents] = useState([]);
   const [faculty, setFaculty] = useState([]);
   const [marks, setMarks] = useState([]);
@@ -82,7 +84,7 @@ export default function AdminDashboard() {
               <div className="section-title" style={{ fontSize: 16 }}>Recent Enrollments</div>
               <div className="section-subtitle">Latest registered students</div>
             </div>
-            <button className="btn btn-secondary btn-sm" onClick={() => window.location.href = '/admin/students'}>
+            <button className="btn btn-secondary btn-sm" onClick={() => navigate('/admin/students')}>
               View All
             </button>
           </div>
@@ -124,11 +126,30 @@ export default function AdminDashboard() {
         {/* Performance */}
         <div className="card">
           <div className="section-title" style={{ fontSize: 16, marginBottom: 20 }}>Department Performance</div>
-          <MiniBar label="Computer Science" value={87} max={100} color="var(--accent)" />
-          <MiniBar label="Mathematics" value={74} max={100} color="var(--accent-2)" />
-          <MiniBar label="Physics" value={68} max={100} color="var(--warning)" />
-          <MiniBar label="Chemistry" value={81} max={100} color="var(--success)" />
-          <MiniBar label="Biology" value={79} max={100} color="#8b5cf6" />
+          
+          {(() => {
+            const depts = [...new Set(students.map(s => s.department).filter(Boolean))];
+            const DEPT_COLORS = ['var(--accent)', 'var(--accent-2)', 'var(--warning)', 'var(--success)', '#8b5cf6'];
+            
+            if (depts.length === 0) {
+              return <div style={{ color: 'var(--text-muted)', fontSize: 13, textAlign: 'center', padding: '20px 0' }}>No department data available</div>;
+            }
+
+            return depts.map((dept, index) => {
+              const deptStudents = students.filter(s => s.department === dept);
+              let totalMarks = 0;
+              let count = 0;
+              deptStudents.forEach(s => {
+                const studentMarks = marks.filter(m => m.studentId === (s.id || s._id));
+                studentMarks.forEach(m => {
+                  totalMarks += m.marksObtained || 0;
+                  count++;
+                });
+              });
+              const avg = count === 0 ? 0 : Math.round(totalMarks / count);
+              return <MiniBar key={dept} label={dept} value={avg} max={100} color={DEPT_COLORS[index % DEPT_COLORS.length]} />;
+            });
+          })()}
 
           <div className="divider" />
 
@@ -157,7 +178,7 @@ export default function AdminDashboard() {
               <div className="section-title" style={{ fontSize: 16 }}>Recent Announcements</div>
               <div className="section-subtitle">Campus-wide communications</div>
             </div>
-            <button className="btn btn-secondary btn-sm" onClick={() => window.location.href = '/admin/announcements'}>
+            <button className="btn btn-secondary btn-sm" onClick={() => navigate('/admin/announcements')}>
               Manage
             </button>
           </div>
@@ -187,16 +208,16 @@ export default function AdminDashboard() {
           <div className="section-title" style={{ fontSize: 16, marginBottom: 20 }}>Quick Actions</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             {[
-              { label: 'Add Student', icon: <Icons.GraduationCap />, path: '/admin/students', color: 'var(--accent)' },
-              { label: 'Add Faculty', icon: <Icons.Users />, path: '/admin/faculty', color: 'var(--accent-2)' },
-              { label: 'Post Announcement', icon: <Icons.Megaphone />, path: '/admin/announcements', color: 'var(--warning)' },
+              { label: 'Add Student', icon: <Icons.GraduationCap />, path: '/admin/students', color: 'var(--accent)', action: 'add_student' },
+              { label: 'Add Faculty', icon: <Icons.Users />, path: '/admin/faculty', color: 'var(--accent-2)', action: 'add_faculty' },
+              { label: 'Post Announcement', icon: <Icons.Megaphone />, path: '/admin/announcements', color: 'var(--warning)', action: 'add_announcement' },
               { label: 'View Reports', icon: <Icons.BarChart />, path: '/admin/marks', color: 'var(--success)' },
-            ].map(({ label, icon, path, color }) => (
+            ].map(({ label, icon, path, color, action }) => (
               <button
                 key={label}
                 className="btn btn-secondary"
                 style={{ flexDirection: 'column', gap: 10, padding: '20px 16px', height: 'auto', borderRadius: 'var(--radius)' }}
-                onClick={() => window.location.href = path}
+                onClick={() => navigate(path, { state: { action } })}
               >
                 <span style={{ color, fontSize: 24 }}>{icon}</span>
                 <span style={{ fontSize: 13 }}>{label}</span>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Layout from '../../components/Layout';
 import { Icons } from '../../components/Icons';
 import * as api from '../../services/api';
@@ -144,9 +145,10 @@ function StudentDetailModal({ student, onClose }) {
 }
 
 export default function AdminStudents() {
+  const location = useLocation();
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showAdd, setShowAdd] = useState(false);
+  const [showAdd, setShowAdd] = useState(location.state?.action === 'add_student');
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [search, setSearch] = useState('');
   const [deptFilter, setDeptFilter] = useState('');

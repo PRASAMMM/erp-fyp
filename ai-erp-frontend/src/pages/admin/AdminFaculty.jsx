@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Layout from '../../components/Layout';
 import { Icons } from '../../components/Icons';
 import * as api from '../../services/api';
@@ -231,9 +232,10 @@ function EditFacultyModal({ faculty, onClose, onSuccess }) {
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function AdminFaculty() {
+  const location = useLocation();
   const [faculty, setFaculty]     = useState([]);
   const [loading, setLoading]     = useState(true);
-  const [showAdd, setShowAdd]     = useState(false);
+  const [showAdd, setShowAdd]     = useState(location.state?.action === 'add_faculty');
   const [editing, setEditing]     = useState(null); // faculty object being edited
   const [search, setSearch]       = useState('');
 
